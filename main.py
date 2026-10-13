@@ -1,6 +1,6 @@
 import json
 from os.path import dirname, abspath, join
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -31,6 +31,18 @@ def countries():
     return list(data.keys())
 
 
+@app.get('/countries/{country}')
+def cities(
+    country: str = Path(
+        ...,
+        description="Use a country name returned by GET /countries.",
+        example="Spain",
+    ),
+):
+    """Return the cities available for a country."""
+    return list(data[country].keys())
+
+
 @app.get('/countries/{country}/{city}/{month}')
 def monthly_average(country: str, city: str, month: str):
     return data[country][city][month]
@@ -39,3 +51,8 @@ def monthly_average(country: str, city: str, month: str):
 openapi_schema = app.openapi()
 with open(join(wellknown_path, "openapi.json"), "w") as f:
     json.dump(openapi_schema, f)
+
+# with open("file.txt", "r") as file:
+#     # Read the file and print the content
+#     contents = file.read()
+#     print(contents)
